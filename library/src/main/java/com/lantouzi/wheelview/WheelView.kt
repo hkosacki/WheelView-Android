@@ -37,7 +37,6 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private var mFadeMarkColor: Int = 0
 
     private var mHeight: Int = 0
-    private var mItems: MutableList<String>? = null
     private var mAdditionCenterMark: String? = null
     public var onWheelItemSelectedListener: OnWheelItemSelectedListener? = null
     private var mIntervalFactor = DEFAULT_INTERVAL_FACTOR
@@ -84,18 +83,12 @@ class WheelView : View, GestureDetector.OnGestureListener {
             }
         }
 
-    var items: List<String>?
-        get() = mItems
+    var items: MutableList<String> = mutableListOf()
         set(value) {
-            if (mItems == null) {
-                mItems = ArrayList()
-            } else {
-                mItems!!.clear()
-            }
-            value?.let {
-                mItems!!.addAll(it)
-            }
-            mMarkCount = if (null == mItems) 0 else mItems!!.size
+            field.clear()
+            field.addAll(value)
+
+            mMarkCount = items.size
             if (mMarkCount > 0) {
                 minSelectableIndex = Math.max(minSelectableIndex, 0)
                 maxSelectableIndex = Math.min(maxSelectableIndex, mMarkCount - 1)
@@ -179,8 +172,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
         val defaultText = "888888"
         val temp = Rect()
         var max = 0
-        if (mItems != null && mItems!!.size > 0) {
-            for (i in mItems!!) {
+        if (items.isNotEmpty()) {
+            for (i in items) {
                 mMarkTextPaint!!.getTextBounds(i, 0, i.length, temp)
                 if (temp.width() > max) {
                     max = temp.width()
@@ -329,7 +322,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
             // mark text
             if (mMarkCount > 0 && i >= 0 && i < mMarkCount) {
-                val temp = mItems!![i]
+                val temp = items[i]
                 if (selectedPosition == i) {
                     mMarkTextPaint!!.color = mHighlightColor
                     mMarkTextPaint!!.textSize = mCenterTextSize
@@ -354,7 +347,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (mItems == null || mItems!!.size == 0 || !isEnabled) {
+        if (items.isEmpty() || !isEnabled) {
             return false
         }
         var ret = mGestureDetectorCompat!!.onTouchEvent(event)
