@@ -65,23 +65,19 @@ class WheelView : View, GestureDetector.OnGestureListener {
     // scroll control args ---- end
 
     private var mLastSelectedIndex = -1
-    private var _minSelectableIndex = Integer.MIN_VALUE
-    private var _maxSelectableIndex = Integer.MAX_VALUE
 
-    var minSelectableIndex: Int
-        get() = _minSelectableIndex
+    var minSelectableIndex: Int = Int.MIN_VALUE
         set(index) {
-            _minSelectableIndex = if (index > _maxSelectableIndex) maxSelectableIndex else index
+            field = if (index > maxSelectableIndex) maxSelectableIndex else index
             val afterCenter = safeCenter(selectedPosition)
             if (afterCenter != selectedPosition) {
                 selectIndex(afterCenter)
             }
         }
 
-    var maxSelectableIndex: Int
-        get() = _maxSelectableIndex
+    var maxSelectableIndex: Int = Int.MAX_VALUE
         set(index) {
-            _maxSelectableIndex = if (maxSelectableIndex < _minSelectableIndex) _minSelectableIndex else index
+            field = if (maxSelectableIndex < minSelectableIndex) minSelectableIndex else index
             val afterCenter = safeCenter(selectedPosition)
             if (afterCenter != selectedPosition) {
                 selectIndex(afterCenter)
@@ -101,8 +97,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
             }
             mMarkCount = if (null == mItems) 0 else mItems!!.size
             if (mMarkCount > 0) {
-                _minSelectableIndex = Math.max(_minSelectableIndex, 0)
-                _maxSelectableIndex = Math.min(_maxSelectableIndex, mMarkCount - 1)
+                minSelectableIndex = Math.max(minSelectableIndex, 0)
+                maxSelectableIndex = Math.min(maxSelectableIndex, mMarkCount - 1)
             }
             mContentRectF!!.set(0f, 0f, (mMarkCount - 1) * mIntervalDis, measuredHeight.toFloat())
             selectedPosition = Math.min(selectedPosition, mMarkCount)
@@ -239,8 +235,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
             scrollY,
             velocityX,
             velocityY,
-            (-mMaxOverScrollDistance + _minSelectableIndex * mIntervalDis).toInt(),
-            (mContentRectF!!.width() - mMaxOverScrollDistance - (mMarkCount - 1 - _maxSelectableIndex) * mIntervalDis).toInt(),
+            (-mMaxOverScrollDistance + minSelectableIndex * mIntervalDis).toInt(),
+            (mContentRectF!!.width() - mMaxOverScrollDistance - (mMarkCount - 1 - maxSelectableIndex) * mIntervalDis).toInt(),
             0,
             0,
             mMaxOverScrollDistance.toInt(),
@@ -282,9 +278,9 @@ class WheelView : View, GestureDetector.OnGestureListener {
         end = Math.min(end, mMarkCount + mViewScopeSize * 2)
 
         // extends both ends
-        if (selectedPosition == _maxSelectableIndex) {
+        if (selectedPosition == maxSelectableIndex) {
             end += mViewScopeSize
-        } else if (selectedPosition == _minSelectableIndex) {
+        } else if (selectedPosition == minSelectableIndex) {
             start -= mViewScopeSize
         }
 
@@ -406,12 +402,12 @@ class WheelView : View, GestureDetector.OnGestureListener {
      * @param center
      * @return
      */
-    private fun safeCenter(center: Int): Int {
-        var center = center
-        if (center < _minSelectableIndex) {
-            center = _minSelectableIndex
-        } else if (center > _maxSelectableIndex) {
-            center = _maxSelectableIndex
+    private fun safeCenter(position: Int): Int {
+        var center = position
+        if (center < minSelectableIndex) {
+            center = minSelectableIndex
+        } else if (center > maxSelectableIndex) {
+            center = maxSelectableIndex
         }
         return center
     }
@@ -474,13 +470,13 @@ class WheelView : View, GestureDetector.OnGestureListener {
     override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
         var dis = distanceX
         val scrollX = scrollX.toFloat()
-        if (scrollX < _minSelectableIndex * mIntervalDis - 2 * mMaxOverScrollDistance) {
+        if (scrollX < minSelectableIndex * mIntervalDis - 2 * mMaxOverScrollDistance) {
             dis = 0f
-        } else if (scrollX < _minSelectableIndex * mIntervalDis - mMaxOverScrollDistance) {
+        } else if (scrollX < minSelectableIndex * mIntervalDis - mMaxOverScrollDistance) {
             dis = distanceX / 4f
-        } else if (scrollX > mContentRectF!!.width() - (mMarkCount - _maxSelectableIndex - 1) * mIntervalDis) {
+        } else if (scrollX > mContentRectF!!.width() - (mMarkCount - maxSelectableIndex - 1) * mIntervalDis) {
             dis = 0f
-        } else if (scrollX > mContentRectF!!.width() - (mMarkCount - _maxSelectableIndex - 1) * mIntervalDis - mMaxOverScrollDistance) {
+        } else if (scrollX > mContentRectF!!.width() - (mMarkCount - maxSelectableIndex - 1) * mIntervalDis - mMaxOverScrollDistance) {
             dis = distanceX / 4f
         }
         scrollBy(dis.toInt(), 0)
@@ -490,7 +486,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
     override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
         val scrollX = scrollX.toFloat()
-        if (scrollX < -mMaxOverScrollDistance + _minSelectableIndex * mIntervalDis || scrollX > mContentRectF!!.width() - mMaxOverScrollDistance - (mMarkCount - 1 - _maxSelectableIndex) * mIntervalDis) {
+        if (scrollX < -mMaxOverScrollDistance + minSelectableIndex * mIntervalDis || scrollX > mContentRectF!!.width() - mMaxOverScrollDistance - (mMarkCount - 1 - maxSelectableIndex) * mIntervalDis) {
             return false
         } else {
             mFling = true
@@ -503,16 +499,16 @@ class WheelView : View, GestureDetector.OnGestureListener {
         val superState = super.onSaveInstanceState()
         val ss = SavedState(superState)
         ss.index = selectedPosition
-        ss.min = _minSelectableIndex
-        ss.max = _maxSelectableIndex
+        ss.min = minSelectableIndex
+        ss.max = maxSelectableIndex
         return ss
     }
 
     public override fun onRestoreInstanceState(state: Parcelable) {
         val ss = state as SavedState
         super.onRestoreInstanceState(ss.superState)
-        _minSelectableIndex = ss.min
-        _maxSelectableIndex = ss.max
+        minSelectableIndex = ss.min
+        maxSelectableIndex = ss.max
         selectIndex(ss.index)
         requestLayout()
     }
