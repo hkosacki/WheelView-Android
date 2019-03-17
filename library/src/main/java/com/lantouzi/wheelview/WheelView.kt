@@ -1,5 +1,6 @@
 package com.lantouzi.wheelview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -8,6 +9,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Parcel
 import android.os.Parcelable
+import android.support.v4.math.MathUtils
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.view.ViewCompat
 import android.text.TextPaint
@@ -19,15 +21,14 @@ import android.view.SoundEffectConstants
 import android.view.View
 import android.widget.OverScroller
 import com.lantouzi.wheelview.library.R
-import java.util.ArrayList
 
 /**
  * Created by kyle on 15/11/9.
  */
 class WheelView : View, GestureDetector.OnGestureListener {
 
-    private var mMarkPaint: Paint? = null
-    private var mMarkTextPaint: TextPaint? = null
+    private lateinit var markPaint: Paint
+    private lateinit var markTextPaint: TextPaint
     var selectedPosition = -1
         private set
 
@@ -38,7 +39,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
     private var mHeight: Int = 0
     private var mAdditionCenterMark: String? = null
-    public var onWheelItemSelectedListener: OnWheelItemSelectedListener? = null
+    var onWheelItemSelectedListener: OnWheelItemSelectedListener? = null
     private var mIntervalFactor = DEFAULT_INTERVAL_FACTOR
     private var mMarkRatio = DEFAULT_MARK_RATIO
 
@@ -49,10 +50,10 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private var mViewScopeSize: Int = 0
 
     // scroll control args ---- start
-    private var mScroller: OverScroller? = null
+    private lateinit var scroller: OverScroller
     private var mMaxOverScrollDistance: Float = 0.0f
-    private var mContentRectF: RectF? = null
-    private var mFling = false
+    private lateinit var contentRectF: RectF
+    private var fling = false
     private var mCenterTextSize: Float = 0.0f
     private var mNormalTextSize: Float = 0.0f
     private var mTopSpace: Float = 0.0f
@@ -60,7 +61,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private var mIntervalDis: Float = 0.0f
     private var mCenterMarkWidth: Float = 0.0f
     private var mMarkWidth: Float = 0.0f
-    private var mGestureDetectorCompat: GestureDetectorCompat? = null
+    private lateinit var gestureDetectorCompat: GestureDetectorCompat
     // scroll control args ---- end
 
     private var mLastSelectedIndex = -1
@@ -93,7 +94,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
                 minSelectableIndex = Math.max(minSelectableIndex, 0)
                 maxSelectableIndex = Math.min(maxSelectableIndex, mMarkCount - 1)
             }
-            mContentRectF!!.set(0f, 0f, (mMarkCount - 1) * mIntervalDis, measuredHeight.toFloat())
+            contentRectF.set(0f, 0f, (mMarkCount - 1) * mIntervalDis, measuredHeight.toFloat())
             selectedPosition = Math.min(selectedPosition, mMarkCount)
             calcIntervalDis()
             invalidate()
@@ -111,7 +112,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
         init(attrs)
     }
 
-    protected fun init(attrs: AttributeSet?) {
+    @SuppressLint("CustomViewStyleable")
+    private fun init(attrs: AttributeSet?) {
         val density = resources.displayMetrics.density
         mCenterMarkWidth = (density * 1.5f + 0.5f).toInt().toFloat()
         mMarkWidth = density
@@ -124,29 +126,30 @@ class WheelView : View, GestureDetector.OnGestureListener {
         mNormalTextSize = density * 18
         mBottomSpace = density * 6
 
-        val ta = if (attrs == null) null else context.obtainStyledAttributes(attrs, R.styleable.lwvWheelView)
-        if (ta != null) {
-            mHighlightColor = ta.getColor(R.styleable.lwvWheelView_lwvHighlightColor, mHighlightColor)
-            mMarkTextColor = ta.getColor(R.styleable.lwvWheelView_lwvMarkTextColor, mMarkTextColor)
-            mMarkColor = ta.getColor(R.styleable.lwvWheelView_lwvMarkColor, mMarkColor)
-            mIntervalFactor = ta.getFloat(R.styleable.lwvWheelView_lwvIntervalFactor, mIntervalFactor)
-            mMarkRatio = ta.getFloat(R.styleable.lwvWheelView_lwvMarkRatio, mMarkRatio)
-            mAdditionCenterMark = ta.getString(R.styleable.lwvWheelView_lwvAdditionalCenterMark)
-            mCenterTextSize = ta.getDimension(R.styleable.lwvWheelView_lwvCenterMarkTextSize, mCenterTextSize)
-            mNormalTextSize = ta.getDimension(R.styleable.lwvWheelView_lwvMarkTextSize, mNormalTextSize)
-            mCursorSize = ta.getDimension(R.styleable.lwvWheelView_lwvCursorSize, mCursorSize)
+        val typedArray = if (attrs == null) null else context.obtainStyledAttributes(attrs, R.styleable.lwvWheelView)
+        typedArray?.let {
+            mHighlightColor = typedArray.getColor(R.styleable.lwvWheelView_lwvHighlightColor, mHighlightColor)
+            mMarkTextColor = typedArray.getColor(R.styleable.lwvWheelView_lwvMarkTextColor, mMarkTextColor)
+            mMarkColor = typedArray.getColor(R.styleable.lwvWheelView_lwvMarkColor, mMarkColor)
+            mIntervalFactor = typedArray.getFloat(R.styleable.lwvWheelView_lwvIntervalFactor, mIntervalFactor)
+            mMarkRatio = typedArray.getFloat(R.styleable.lwvWheelView_lwvMarkRatio, mMarkRatio)
+            mAdditionCenterMark = typedArray.getString(R.styleable.lwvWheelView_lwvAdditionalCenterMark)
+            mCenterTextSize = typedArray.getDimension(R.styleable.lwvWheelView_lwvCenterMarkTextSize, mCenterTextSize)
+            mNormalTextSize = typedArray.getDimension(R.styleable.lwvWheelView_lwvMarkTextSize, mNormalTextSize)
+            mCursorSize = typedArray.getDimension(R.styleable.lwvWheelView_lwvCursorSize, mCursorSize)
+            typedArray.recycle()
         }
         mFadeMarkColor = mHighlightColor and -0x55000001
         mIntervalFactor = Math.max(1f, mIntervalFactor)
         mMarkRatio = Math.min(1f, mMarkRatio)
         mTopSpace = mCursorSize + density * 2
 
-        mMarkPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        markPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = mMarkColor
             strokeWidth = mCenterMarkWidth
         }
 
-        mMarkTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+        markTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
             textAlign = Paint.Align.CENTER
             color = mHighlightColor
             textSize = mCenterTextSize
@@ -154,10 +157,10 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
         calcIntervalDis()
 
-        mScroller = OverScroller(context)
-        mContentRectF = RectF()
+        scroller = OverScroller(context)
+        contentRectF = RectF()
 
-        mGestureDetectorCompat = GestureDetectorCompat(context, this)
+        gestureDetectorCompat = GestureDetectorCompat(context, this)
 
         selectIndex(0)
     }
@@ -166,32 +169,31 @@ class WheelView : View, GestureDetector.OnGestureListener {
      * calculate interval distance between items
      */
     private fun calcIntervalDis() {
-        if (mMarkTextPaint == null) {
-            return
-        }
-        val defaultText = "888888"
-        val temp = Rect()
-        var max = 0
-        if (items.isNotEmpty()) {
-            for (i in items) {
-                mMarkTextPaint!!.getTextBounds(i, 0, i.length, temp)
-                if (temp.width() > max) {
-                    max = temp.width()
+        markTextPaint.let {
+            val defaultText = "888888"
+            val temp = Rect()
+            var max = 0
+            if (items.isNotEmpty()) {
+                for (i in items) {
+                    it.getTextBounds(i, 0, i.length, temp)
+                    if (temp.width() > max) {
+                        max = temp.width()
+                    }
                 }
+            } else {
+                it.getTextBounds(defaultText, 0, defaultText.length, temp)
+                max = temp.width()
             }
-        } else {
-            mMarkTextPaint!!.getTextBounds(defaultText, 0, defaultText.length, temp)
-            max = temp.width()
-        }
 
-        if (!TextUtils.isEmpty(mAdditionCenterMark)) {
-            mMarkTextPaint!!.textSize = mNormalTextSize
-            mMarkTextPaint!!.getTextBounds(mAdditionCenterMark, 0, mAdditionCenterMark!!.length, temp)
-            mAdditionCenterMarkWidth = temp.width().toFloat()
-            max += temp.width()
-        }
+            if (!TextUtils.isEmpty(mAdditionCenterMark)) {
+                it.textSize = mNormalTextSize
+                it.getTextBounds(mAdditionCenterMark, 0, mAdditionCenterMark!!.length, temp)
+                mAdditionCenterMarkWidth = temp.width().toFloat()
+                max += temp.width()
+            }
 
-        mIntervalDis = max * mIntervalFactor
+            mIntervalDis = max * mIntervalFactor
+        }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -223,13 +225,13 @@ class WheelView : View, GestureDetector.OnGestureListener {
     }
 
     fun fling(velocityX: Int, velocityY: Int) {
-        mScroller!!.fling(
+        scroller.fling(
             scrollX,
             scrollY,
             velocityX,
             velocityY,
             (-mMaxOverScrollDistance + minSelectableIndex * mIntervalDis).toInt(),
-            (mContentRectF!!.width() - mMaxOverScrollDistance - (mMarkCount - 1 - maxSelectableIndex) * mIntervalDis).toInt(),
+            (contentRectF.width() - mMaxOverScrollDistance - (mMarkCount - 1 - maxSelectableIndex) * mIntervalDis).toInt(),
             0,
             0,
             mMaxOverScrollDistance.toInt(),
@@ -243,7 +245,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
         if (w != oldw || h != oldh) {
             mHeight = h
             mMaxOverScrollDistance = w / 2f
-            mContentRectF!!.set(0f, 0f, (mMarkCount - 1) * mIntervalDis, h.toFloat())
+            contentRectF.set(0f, 0f, (mMarkCount - 1) * mIntervalDis, h.toFloat())
             mViewScopeSize = Math.ceil((mMaxOverScrollDistance / mIntervalDis).toDouble()).toInt()
         }
     }
@@ -254,15 +256,17 @@ class WheelView : View, GestureDetector.OnGestureListener {
         mCenterIndicatorPath.reset()
         val sizeDiv2 = mCursorSize / 2f
         val sizeDiv3 = mCursorSize / 3f
-        mCenterIndicatorPath.moveTo(mMaxOverScrollDistance - sizeDiv2 + scrollX, 0f)
-        mCenterIndicatorPath.rLineTo(0f, sizeDiv3)
-        mCenterIndicatorPath.rLineTo(sizeDiv2, sizeDiv2)
-        mCenterIndicatorPath.rLineTo(sizeDiv2, -sizeDiv2)
-        mCenterIndicatorPath.rLineTo(0f, -sizeDiv3)
-        mCenterIndicatorPath.close()
+        with(mCenterIndicatorPath) {
+            moveTo(mMaxOverScrollDistance - sizeDiv2 + scrollX, 0f)
+            rLineTo(0f, sizeDiv3)
+            rLineTo(sizeDiv2, sizeDiv2)
+            rLineTo(sizeDiv2, -sizeDiv2)
+            rLineTo(0f, -sizeDiv3)
+            close()
+        }
 
-        mMarkPaint!!.color = mHighlightColor
-        canvas.drawPath(mCenterIndicatorPath, mMarkPaint!!)
+        markPaint.color = mHighlightColor
+        canvas.drawPath(mCenterIndicatorPath, markPaint)
 
         var start = selectedPosition - mViewScopeSize
         var end = selectedPosition + mViewScopeSize + 1
@@ -290,32 +294,32 @@ class WheelView : View, GestureDetector.OnGestureListener {
             for (offset in -2..2) {
                 val ox = x + offset * tempDis
 
-                if (i >= 0 && i <= mMarkCount && selectedPosition == i) {
+                if (i in 0..mMarkCount && selectedPosition == i) {
                     val tempOffset = Math.abs(offset)
                     if (tempOffset == 0) {
-                        mMarkPaint!!.color = mHighlightColor
+                        markPaint.color = mHighlightColor
                     } else if (tempOffset == 1) {
-                        mMarkPaint!!.color = mFadeMarkColor
+                        markPaint.color = mFadeMarkColor
                     } else {
-                        mMarkPaint!!.color = mMarkColor
+                        markPaint.color = mMarkColor
                     }
                 } else {
-                    mMarkPaint!!.color = mMarkColor
+                    markPaint.color = mMarkColor
                 }
 
                 if (offset == 0) {
                     // center mark
-                    mMarkPaint!!.strokeWidth = mCenterMarkWidth
-                    canvas.drawLine(ox, mTopSpace, ox, mTopSpace + markHeight, mMarkPaint!!)
+                    markPaint.strokeWidth = mCenterMarkWidth
+                    canvas.drawLine(ox, mTopSpace, ox, mTopSpace + markHeight, markPaint)
                 } else {
                     // other small mark
-                    mMarkPaint!!.strokeWidth = mMarkWidth
+                    markPaint.strokeWidth = mMarkWidth
                     canvas.drawLine(
                         ox,
                         mTopSpace + smallMarkShrinkY,
                         ox,
                         mTopSpace + markHeight - smallMarkShrinkY,
-                        mMarkPaint!!
+                        markPaint
                     )
                 }
             }
@@ -324,21 +328,21 @@ class WheelView : View, GestureDetector.OnGestureListener {
             if (mMarkCount > 0 && i >= 0 && i < mMarkCount) {
                 val temp = items[i]
                 if (selectedPosition == i) {
-                    mMarkTextPaint!!.color = mHighlightColor
-                    mMarkTextPaint!!.textSize = mCenterTextSize
+                    markTextPaint.color = mHighlightColor
+                    markTextPaint.textSize = mCenterTextSize
                     if (!TextUtils.isEmpty(mAdditionCenterMark)) {
                         val off = mAdditionCenterMarkWidth / 2f
-                        val tsize = mMarkTextPaint!!.measureText(temp, 0, temp.length)
-                        canvas.drawText(temp, 0, temp.length, x - off, mHeight - mBottomSpace, mMarkTextPaint!!)
-                        mMarkTextPaint!!.textSize = mNormalTextSize
-                        canvas.drawText(mAdditionCenterMark!!, x + tsize / 2f, mHeight - mBottomSpace, mMarkTextPaint!!)
+                        val tsize = markTextPaint.measureText(temp, 0, temp.length)
+                        canvas.drawText(temp, 0, temp.length, x - off, mHeight - mBottomSpace, markTextPaint)
+                        markTextPaint.textSize = mNormalTextSize
+                        canvas.drawText(mAdditionCenterMark!!, x + tsize / 2f, mHeight - mBottomSpace, markTextPaint)
                     } else {
-                        canvas.drawText(temp, 0, temp.length, x, mHeight - mBottomSpace, mMarkTextPaint!!)
+                        canvas.drawText(temp, 0, temp.length, x, mHeight - mBottomSpace, markTextPaint)
                     }
                 } else {
-                    mMarkTextPaint!!.color = mMarkTextColor
-                    mMarkTextPaint!!.textSize = mNormalTextSize
-                    canvas.drawText(temp, 0, temp.length, x, mHeight - mBottomSpace, mMarkTextPaint!!)
+                    markTextPaint.color = mMarkTextColor
+                    markTextPaint.textSize = mNormalTextSize
+                    canvas.drawText(temp, 0, temp.length, x, mHeight - mBottomSpace, markTextPaint)
                 }
             }
 
@@ -350,8 +354,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
         if (items.isEmpty() || !isEnabled) {
             return false
         }
-        var ret = mGestureDetectorCompat!!.onTouchEvent(event)
-        if (!mFling && MotionEvent.ACTION_UP == event.action) {
+        var ret = gestureDetectorCompat.onTouchEvent(event)
+        if (!fling && MotionEvent.ACTION_UP == event.action) {
             autoSettle()
             ret = true
         }
@@ -360,13 +364,13 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
     override fun computeScroll() {
         super.computeScroll()
-        if (mScroller!!.computeScrollOffset()) {
-            scrollTo(mScroller!!.currX, mScroller!!.currY)
+        if (scroller.computeScrollOffset()) {
+            scrollTo(scroller.currX, scroller.currY)
             refreshCenter()
             invalidate()
         } else {
-            if (mFling) {
-                mFling = false
+            if (fling) {
+                fling = false
                 autoSettle()
             }
         }
@@ -381,7 +385,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private fun autoSettle() {
         val sx = scrollX
         val dx = selectedPosition * mIntervalDis - sx.toFloat() - mMaxOverScrollDistance
-        mScroller!!.startScroll(sx, 0, dx.toInt(), 0)
+        scroller.startScroll(sx, 0, dx.toInt(), 0)
         postInvalidate()
         if (mLastSelectedIndex != selectedPosition) {
             mLastSelectedIndex = selectedPosition
@@ -392,18 +396,10 @@ class WheelView : View, GestureDetector.OnGestureListener {
     /**
      * limit center index in bounds.
      *
-     * @param center
+     * @param position
      * @return
      */
-    private fun safeCenter(position: Int): Int {
-        var center = position
-        if (center < minSelectableIndex) {
-            center = minSelectableIndex
-        } else if (center > maxSelectableIndex) {
-            center = maxSelectableIndex
-        }
-        return center
-    }
+    private fun safeCenter(position: Int): Int = MathUtils.clamp(position, minSelectableIndex, maxSelectableIndex)
 
     private fun refreshCenter(offsetX: Int = scrollX) {
         val offset = (offsetX + mMaxOverScrollDistance).toInt()
@@ -426,28 +422,26 @@ class WheelView : View, GestureDetector.OnGestureListener {
     }
 
     fun smoothSelectIndex(index: Int) {
-        if (!mScroller!!.isFinished) {
-            mScroller!!.abortAnimation()
+        if (!scroller.isFinished) {
+            scroller.abortAnimation()
         }
         val deltaIndex = index - selectedPosition
-        mScroller!!.startScroll(scrollX, 0, (deltaIndex * mIntervalDis).toInt(), 0)
+        scroller.startScroll(scrollX, 0, (deltaIndex * mIntervalDis).toInt(), 0)
         invalidate()
     }
 
     override fun onDown(e: MotionEvent): Boolean {
-        if (!mScroller!!.isFinished) {
-            mScroller!!.forceFinished(false)
+        if (!scroller.isFinished) {
+            scroller.forceFinished(false)
         }
-        mFling = false
+        fling = false
         if (null != parent) {
             parent.requestDisallowInterceptTouchEvent(true)
         }
         return true
     }
 
-    override fun onShowPress(e: MotionEvent) {
-
-    }
+    override fun onShowPress(e: MotionEvent) {}
 
     override fun onSingleTapUp(e: MotionEvent): Boolean {
         playSoundEffect(SoundEffectConstants.CLICK)
@@ -456,21 +450,17 @@ class WheelView : View, GestureDetector.OnGestureListener {
         return true
     }
 
-    override fun onLongPress(e: MotionEvent) {
-
-    }
+    override fun onLongPress(e: MotionEvent) {}
 
     override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
         var dis = distanceX
         val scrollX = scrollX.toFloat()
-        if (scrollX < minSelectableIndex * mIntervalDis - 2 * mMaxOverScrollDistance) {
-            dis = 0f
-        } else if (scrollX < minSelectableIndex * mIntervalDis - mMaxOverScrollDistance) {
-            dis = distanceX / 4f
-        } else if (scrollX > mContentRectF!!.width() - (mMarkCount - maxSelectableIndex - 1) * mIntervalDis) {
-            dis = 0f
-        } else if (scrollX > mContentRectF!!.width() - (mMarkCount - maxSelectableIndex - 1) * mIntervalDis - mMaxOverScrollDistance) {
-            dis = distanceX / 4f
+        when {
+            scrollX < minSelectableIndex * mIntervalDis - 2 * mMaxOverScrollDistance -> dis = 0f
+            scrollX < minSelectableIndex * mIntervalDis - mMaxOverScrollDistance -> dis = distanceX / 4f
+            scrollX > contentRectF.width() - (mMarkCount - maxSelectableIndex - 1) * mIntervalDis -> dis = 0f
+            scrollX > contentRectF.width() - (mMarkCount - maxSelectableIndex - 1) * mIntervalDis - mMaxOverScrollDistance -> dis =
+                distanceX / 4f
         }
         scrollBy(dis.toInt(), 0)
         refreshCenter()
@@ -479,30 +469,34 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
     override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
         val scrollX = scrollX.toFloat()
-        if (scrollX < -mMaxOverScrollDistance + minSelectableIndex * mIntervalDis || scrollX > mContentRectF!!.width() - mMaxOverScrollDistance - (mMarkCount - 1 - maxSelectableIndex) * mIntervalDis) {
-            return false
+        return if (
+            scrollX < -mMaxOverScrollDistance + minSelectableIndex * mIntervalDis ||
+            scrollX > contentRectF.width() - mMaxOverScrollDistance - (mMarkCount - 1 - maxSelectableIndex) * mIntervalDis
+        ) {
+            false
         } else {
-            mFling = true
+            fling = true
             fling((-velocityX).toInt(), 0)
-            return true
+            true
         }
     }
 
     public override fun onSaveInstanceState(): Parcelable? {
         val superState = super.onSaveInstanceState()
-        val ss = SavedState(superState)
-        ss.index = selectedPosition
-        ss.min = minSelectableIndex
-        ss.max = maxSelectableIndex
-        return ss
+        return SavedState(superState).apply {
+            index = selectedPosition
+            min = minSelectableIndex
+            max = maxSelectableIndex
+        }
     }
 
     public override fun onRestoreInstanceState(state: Parcelable) {
-        val ss = state as SavedState
-        super.onRestoreInstanceState(ss.superState)
-        minSelectableIndex = ss.min
-        maxSelectableIndex = ss.max
-        selectIndex(ss.index)
+        (state as SavedState).let {
+            super.onRestoreInstanceState(it.superState)
+            minSelectableIndex = it.min
+            maxSelectableIndex = it.max
+            selectIndex(it.index)
+        }
         requestLayout()
     }
 
@@ -517,19 +511,23 @@ class WheelView : View, GestureDetector.OnGestureListener {
         var min: Int = 0
         var max: Int = 0
 
-        constructor(superState: Parcelable) : super(superState) {}
+        constructor(superState: Parcelable?) : super(superState)
 
-        private constructor(`in`: Parcel) : super(`in`) {
-            index = `in`.readInt()
-            min = `in`.readInt()
-            max = `in`.readInt()
+        private constructor(incoming: Parcel) : super(incoming) {
+            with(incoming) {
+                index = readInt()
+                min = readInt()
+                max = readInt()
+            }
         }
 
         override fun writeToParcel(out: Parcel, flags: Int) {
             super.writeToParcel(out, flags)
-            out.writeInt(index)
-            out.writeInt(min)
-            out.writeInt(max)
+            with(out) {
+                writeInt(index)
+                writeInt(min)
+                writeInt(max)
+            }
         }
 
         override fun toString(): String {
@@ -553,7 +551,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     }
 
     companion object {
-        val DEFAULT_INTERVAL_FACTOR = 1.2f
-        val DEFAULT_MARK_RATIO = 0.7f
+        const val DEFAULT_INTERVAL_FACTOR = 1.2f
+        const val DEFAULT_MARK_RATIO = 0.7f
     }
 }
