@@ -33,8 +33,8 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:background="@android:color/white"
-				app:lwvHighlightColor="#7CD717"
-				app:lwvIntervalFactor="1.1"/>
+				app:highlightColor="#7CD717"
+				app:intervalFactor="1.1"/>
 
 			<com.lantouzi.wheelview.WheelView
 				android:id="@+id/wheelview3"
@@ -42,10 +42,10 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:background="@android:color/white"
-				app:lwvHighlightColor="#31B1E6"
-				app:lwvIntervalFactor="1.3"
-				app:lwvMarkRatio="0.2"
-				app:lwvMarkTextColor="#919191"/>
+				app:highlightColor="#31B1E6"
+				app:intervalFactor="1.3"
+				app:markRatio="0.2"
+				app:markTextColor="#919191"/>
 
 		</LinearLayout>
 
@@ -55,10 +55,10 @@
 			android:layout_height="wrap_content"
 			android:layout_marginTop="16dp"
 			android:background="#222222"
-			app:lwvAdditionalCenterMark="元"
-			app:lwvHighlightColor="#31B1E6"
-			app:lwvMarkColor="#EEEEEE"
-			app:lwvMarkTextColor="#CACACA"/>
+			app:additionalCenterMark="元"
+			app:highlightColor="#31B1E6"
+			app:markColor="#EEEEEE"
+			app:markTextColor="#CACACA"/>
 
 		<com.lantouzi.wheelview.WheelView
 			android:id="@+id/wheelview5"
@@ -66,13 +66,13 @@
 			android:layout_height="wrap_content"
 			android:layout_marginTop="16dp"
 			android:background="#222222"
-			app:lwvAdditionalCenterMark="元"
-			app:lwvCenterMarkTextSize="14sp"
-			app:lwvCursorSize="10dp"
-			app:lwvHighlightColor="#31B1E6"
-			app:lwvMarkColor="#EEEEEE"
-			app:lwvMarkTextColor="#CACACA"
-			app:lwvMarkTextSize="12sp"/>
+			app:additionalCenterMark="元"
+			app:centerMarkTextSize="14sp"
+			app:cursorSize="10dp"
+			app:highlightColor="#31B1E6"
+			app:markColor="#EEEEEE"
+			app:markTextColor="#CACACA"
+			app:markTextSize="12sp"/>
 
 		<TextView
 			android:id="@+id/changed_tv"

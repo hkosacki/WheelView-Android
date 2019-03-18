@@ -9,7 +9,6 @@ version = "1.1.2"
 
 android {
     compileSdkVersion 28
-    resourcePrefix "lwv"
 
     defaultConfig {
         minSdkVersion 23

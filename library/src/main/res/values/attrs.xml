@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<declare-styleable name="lwvWheelView">
-		<attr name="lwvHighlightColor" format="color|reference"/>
-		<attr name="lwvMarkColor" format="color|reference"/>
-		<attr name="lwvMarkTextColor" format="color|reference"/>
-		<attr name="lwvIntervalFactor" format="float"/>
-		<attr name="lwvMarkRatio" format="float"/>
-		<attr name="lwvCursorSize" format="dimension"/>
-		<attr name="lwvMarkTextSize" format="dimension"/>
-		<attr name="lwvCenterMarkTextSize" format="dimension"/>
-		<attr name="lwvAdditionalCenterMark" format="string|reference"/>
+	<declare-styleable name="WheelView">
+		<attr name="highlightColor" format="color|reference"/>
+		<attr name="markColor" format="color|reference"/>
+		<attr name="markTextColor" format="color|reference"/>
+		<attr name="intervalFactor" format="float"/>
+		<attr name="markRatio" format="float"/>
+		<attr name="cursorSize" format="dimension"/>
+		<attr name="markTextSize" format="dimension"/>
+		<attr name="centerMarkTextSize" format="dimension"/>
+		<attr name="additionalCenterMark" format="string|reference"/>
 	</declare-styleable>
 </resources>

@@ -126,7 +126,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
         mNormalTextSize = density * 18
         mBottomSpace = density * 6
 
-        val typedArray = if (attrs == null) null else context.obtainStyledAttributes(attrs, R.styleable.lwvWheelView)
+        val typedArray = if (attrs == null) null else context.obtainStyledAttributes(attrs, R.styleable.WheelView)
         typedArray?.let {
             mHighlightColor = typedArray.getColor(R.styleable.lwvWheelView_lwvHighlightColor, mHighlightColor)
             mMarkTextColor = typedArray.getColor(R.styleable.lwvWheelView_lwvMarkTextColor, mMarkTextColor)
