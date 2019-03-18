@@ -298,12 +298,10 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
                 if (i in 0..mMarkCount && selectedPosition == i) {
                     val tempOffset = Math.abs(offset)
-                    if (tempOffset == 0) {
-                        markPaint.color = mHighlightColor
-                    } else if (tempOffset == 1) {
-                        markPaint.color = mFadeMarkColor
-                    } else {
-                        markPaint.color = mMarkColor
+                    when (tempOffset) {
+                        0 -> markPaint.color = mHighlightColor
+                        1 -> markPaint.color = mFadeMarkColor
+                        else -> markPaint.color = mMarkColor
                     }
                 } else {
                     markPaint.color = mMarkColor
@@ -541,8 +539,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
         companion object {
             @JvmField
             val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-                override fun createFromParcel(`in`: Parcel): SavedState {
-                    return SavedState(`in`)
+                override fun createFromParcel(incoming: Parcel): SavedState {
+                    return SavedState(incoming)
                 }
 
                 override fun newArray(size: Int): Array<SavedState?> {
