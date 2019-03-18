@@ -22,6 +22,7 @@ import android.view.MotionEvent
 import android.view.SoundEffectConstants
 import android.view.View
 import android.widget.OverScroller
+import android.widget.Scroller
 import com.lantouzi.wheelview.library.R
 
 /**
@@ -55,7 +56,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private var viewScopeSize: Int = 0
 
     // scroll control args ---- start
-    private lateinit var scroller: OverScroller
+    private lateinit var scroller: Scroller
     private var maxOverScrollDistance: Float = 0.0f
     private lateinit var contentRectF: RectF
     private var fling = false
@@ -168,7 +169,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
         calcIntervalDis()
 
-        scroller = OverScroller(context)
+        scroller = Scroller(context)
         contentRectF = RectF()
 
         gestureDetectorCompat = GestureDetectorCompat(context, this)
@@ -245,8 +246,6 @@ class WheelView : View, GestureDetector.OnGestureListener {
             (-maxOverScrollDistance + minSelectableIndex * intervalDis).toInt(),
             (contentRectF.width() - maxOverScrollDistance - (markCount - 1 - maxSelectableIndex) * intervalDis).toInt(),
             0,
-            0,
-            maxOverScrollDistance.toInt(),
             0
         )
         ViewCompat.postInvalidateOnAnimation(this)
