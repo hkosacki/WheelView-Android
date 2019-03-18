@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-	private WheelView mWheelView;
+	private WheelView mWheelView, mWheelView2;
 	private TextView mSelectedTv, mChangedTv;
 
 	@Override
@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 
 		mWheelView = findViewById(R.id.wheelview);
+		mWheelView2 = findViewById(R.id.wheelview2);
 		mSelectedTv = findViewById(R.id.selected_tv);
 		mChangedTv = findViewById(R.id.changed_tv);
 
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		mWheelView.setItems(items);
+		mWheelView2.setItems(items);
 		mWheelView.selectIndex(8);
 
 		mSelectedTv.setText(String.format("onWheelItemSelected：%1$s", ""));
