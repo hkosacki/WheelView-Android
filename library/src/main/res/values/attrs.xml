@@ -6,7 +6,7 @@
 		<attr name="markTextColor" format="color|reference"/>
 		<attr name="intervalFactor" format="float"/>
 		<attr name="markRatio" format="float"/>
-		<attr name="font" format="reference"/>
+		<attr name="rulerFont" format="reference"/>
 		<attr name="useDefaultSpacing" format="boolean"/>
 		<attr name="cursorSize" format="dimension"/>
 		<attr name="markTextSize" format="dimension"/>

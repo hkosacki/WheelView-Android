@@ -7,8 +7,10 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.os.Parcel
 import android.os.Parcelable
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.math.MathUtils
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.view.ViewCompat
@@ -43,6 +45,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private var intervalFactor = DEFAULT_INTERVAL_FACTOR
     private var markRatio = DEFAULT_MARK_RATIO
     private var useDefaultSpacing = false
+    private var fontResource: Int = NO_VAULE
+    private var fontTypeface: Typeface? = null
 
     private var markCount: Int = 0
     private var additionCenterMarkWidth: Float = 0.0f
@@ -127,7 +131,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
         normalTextSize = density * 18
         bottomSpace = density * 6
 
-        attrs?.let{
+        attrs?.let {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.WheelView)
             highlightColor = typedArray.getColor(R.styleable.WheelView_highlightColor, highlightColor)
             markTextColor = typedArray.getColor(R.styleable.WheelView_markTextColor, markTextColor)
@@ -139,6 +143,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
             normalTextSize = typedArray.getDimension(R.styleable.WheelView_markTextSize, normalTextSize)
             cursorSize = typedArray.getDimension(R.styleable.WheelView_cursorSize, cursorSize)
             useDefaultSpacing = typedArray.getBoolean(R.styleable.WheelView_useDefaultSpacing, useDefaultSpacing)
+            fontResource = typedArray.getResourceId(R.styleable.WheelView_rulerFont, NO_VAULE)
             typedArray.recycle()
         }
 
@@ -146,6 +151,9 @@ class WheelView : View, GestureDetector.OnGestureListener {
         intervalFactor = Math.max(1f, intervalFactor)
         markRatio = Math.min(1f, markRatio)
         topSpace = cursorSize + density * 2
+        if (fontResource != NO_VAULE) {
+            fontTypeface = ResourcesCompat.getFont(context, fontResource)
+        }
 
         markPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = markColor
@@ -330,6 +338,9 @@ class WheelView : View, GestureDetector.OnGestureListener {
             if (markCount > 0 && i >= 0 && i < markCount) {
                 val temp = items[i]
                 if (selectedPosition == i) {
+                    fontTypeface?.let {
+                        markTextPaint.typeface = it
+                    }
                     markTextPaint.color = highlightColor
                     markTextPaint.textSize = centerTextSize
                     if (!TextUtils.isEmpty(additionCenterMark)) {
@@ -337,7 +348,12 @@ class WheelView : View, GestureDetector.OnGestureListener {
                         val tsize = markTextPaint.measureText(temp, 0, temp.length)
                         canvas.drawText(temp, 0, temp.length, x - off, internalHeight - bottomSpace, markTextPaint)
                         markTextPaint.textSize = normalTextSize
-                        canvas.drawText(additionCenterMark!!, x + tsize / 2f, internalHeight - bottomSpace, markTextPaint)
+                        canvas.drawText(
+                            additionCenterMark!!,
+                            x + tsize / 2f,
+                            internalHeight - bottomSpace,
+                            markTextPaint
+                        )
                     } else {
                         canvas.drawText(temp, 0, temp.length, x, internalHeight - bottomSpace, markTextPaint)
                     }
@@ -555,5 +571,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     companion object {
         const val DEFAULT_INTERVAL_FACTOR = 1.2f
         const val DEFAULT_MARK_RATIO = 0.7f
+
+        const val NO_VAULE = -1
     }
 }
