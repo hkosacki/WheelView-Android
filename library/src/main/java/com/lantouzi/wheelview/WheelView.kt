@@ -118,9 +118,9 @@ class WheelView : View, GestureDetector.OnGestureListener {
         mCenterMarkWidth = (density * 1.5f + 0.5f).toInt().toFloat()
         mMarkWidth = density
 
-        mHighlightColor = -0x8b3c7
-        mMarkTextColor = -0x99999a
-        mMarkColor = -0x111112
+        mHighlightColor = 0xFFF74C39.toInt()
+        mMarkTextColor = 0xFF666666.toInt()
+        mMarkColor = 0xFFEEEEEE.toInt()
         mCursorSize = density * 18
         mCenterTextSize = density * 22
         mNormalTextSize = density * 18
@@ -140,7 +140,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
             typedArray.recycle()
         }
 
-        mFadeMarkColor = mHighlightColor and -0x55000001
+        mFadeMarkColor = mHighlightColor and 0xAAFFFFFF.toInt()
         mIntervalFactor = Math.max(1f, mIntervalFactor)
         mMarkRatio = Math.min(1f, mMarkRatio)
         mTopSpace = mCursorSize + density * 2
