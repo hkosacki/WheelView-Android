@@ -1,91 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-	<LinearLayout
-		xmlns:app="http://schemas.android.com/apk/res-auto"
-		xmlns:tools="http://schemas.android.com/tools"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:background="#fafafa"
-		android:orientation="vertical"
-		android:weightSum="2"
-		tools:context=".MainActivity">
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fafafa"
+        android:orientation="vertical"
+        android:weightSum="2"
+        tools:context=".MainActivity">
 
-		<LinearLayout
-			android:layout_width="wrap_content"
-			android:layout_height="0dp"
-			android:layout_weight="1"
-			android:orientation="vertical">
+        <com.lantouzi.wheelview.WheelView
+            android:id="@+id/wheelview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/white"
+            app:useDefaultSpacing="true" />
 
-			<com.lantouzi.wheelview.WheelView
-				android:id="@+id/wheelview"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:background="@android:color/white"/>
+        <TextView
+            android:id="@+id/changed_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center" />
 
-			<com.lantouzi.wheelview.WheelView
-				android:id="@+id/wheelview2"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:background="@android:color/white"
-				app:highlightColor="#7CD717"
-				app:intervalFactor="1.1"/>
-
-			<com.lantouzi.wheelview.WheelView
-				android:id="@+id/wheelview3"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:background="@android:color/white"
-				app:highlightColor="#31B1E6"
-				app:intervalFactor="1.3"
-				app:markRatio="0.2"
-				app:markTextColor="#919191"/>
-
-		</LinearLayout>
-
-		<com.lantouzi.wheelview.WheelView
-			android:id="@+id/wheelview4"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp"
-			android:background="#222222"
-			app:additionalCenterMark="元"
-			app:highlightColor="#31B1E6"
-			app:markColor="#EEEEEE"
-			app:markTextColor="#CACACA"/>
-
-		<com.lantouzi.wheelview.WheelView
-			android:id="@+id/wheelview5"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp"
-			android:background="#222222"
-			app:additionalCenterMark="元"
-			app:centerMarkTextSize="14sp"
-			app:cursorSize="10dp"
-			app:highlightColor="#31B1E6"
-			app:markColor="#EEEEEE"
-			app:markTextColor="#CACACA"
-			app:markTextSize="12sp"/>
-
-		<TextView
-			android:id="@+id/changed_tv"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_margin="8dp"
-			android:gravity="center"/>
-
-		<TextView
-			android:id="@+id/selected_tv"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_margin="8dp"
-			android:gravity="center"/>
-	</LinearLayout>
+        <TextView
+            android:id="@+id/selected_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center" />
+    </LinearLayout>
 </ScrollView>

@@ -42,6 +42,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     var onWheelItemSelectedListener: OnWheelItemSelectedListener? = null
     private var intervalFactor = DEFAULT_INTERVAL_FACTOR
     private var markRatio = DEFAULT_MARK_RATIO
+    private var useDefaultSpacing = false
 
     private var markCount: Int = 0
     private var additionCenterMarkWidth: Float = 0.0f
@@ -137,6 +138,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
             centerTextSize = typedArray.getDimension(R.styleable.WheelView_centerMarkTextSize, centerTextSize)
             normalTextSize = typedArray.getDimension(R.styleable.WheelView_markTextSize, normalTextSize)
             cursorSize = typedArray.getDimension(R.styleable.WheelView_cursorSize, cursorSize)
+            useDefaultSpacing = typedArray.getBoolean(R.styleable.WheelView_useDefaultSpacing, useDefaultSpacing)
             typedArray.recycle()
         }
 
@@ -174,7 +176,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
             val defaultText = "888888"
             val temp = Rect()
             var max = 0
-            if (items.isNotEmpty()) {
+            if (!useDefaultSpacing && items.isNotEmpty()) {
                 for (i in items) {
                     it.getTextBounds(i, 0, i.length, temp)
                     if (temp.width() > max) {
