@@ -207,6 +207,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
         var result = suggestedMinimumWidth
         when (measureMode) {
             View.MeasureSpec.AT_MOST, View.MeasureSpec.EXACTLY -> result = measureSize
+            View.MeasureSpec.UNSPECIFIED -> Unit
             else -> Unit
         }
         return result
@@ -219,8 +220,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
         when (measureMode) {
             View.MeasureSpec.EXACTLY -> result = Math.max(result, measureSize)
             View.MeasureSpec.AT_MOST -> result = Math.min(result, measureSize)
-            else -> {
-            }
+            View.MeasureSpec.UNSPECIFIED -> Unit
+            else -> Unit
         }
         return result
     }
