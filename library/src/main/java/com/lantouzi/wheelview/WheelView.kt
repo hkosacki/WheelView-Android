@@ -126,19 +126,20 @@ class WheelView : View, GestureDetector.OnGestureListener {
         mNormalTextSize = density * 18
         mBottomSpace = density * 6
 
-        val typedArray = if (attrs == null) null else context.obtainStyledAttributes(attrs, R.styleable.WheelView)
-        typedArray?.let {
-            mHighlightColor = typedArray.getColor(R.styleable.lwvWheelView_lwvHighlightColor, mHighlightColor)
-            mMarkTextColor = typedArray.getColor(R.styleable.lwvWheelView_lwvMarkTextColor, mMarkTextColor)
-            mMarkColor = typedArray.getColor(R.styleable.lwvWheelView_lwvMarkColor, mMarkColor)
-            mIntervalFactor = typedArray.getFloat(R.styleable.lwvWheelView_lwvIntervalFactor, mIntervalFactor)
-            mMarkRatio = typedArray.getFloat(R.styleable.lwvWheelView_lwvMarkRatio, mMarkRatio)
-            mAdditionCenterMark = typedArray.getString(R.styleable.lwvWheelView_lwvAdditionalCenterMark)
-            mCenterTextSize = typedArray.getDimension(R.styleable.lwvWheelView_lwvCenterMarkTextSize, mCenterTextSize)
-            mNormalTextSize = typedArray.getDimension(R.styleable.lwvWheelView_lwvMarkTextSize, mNormalTextSize)
-            mCursorSize = typedArray.getDimension(R.styleable.lwvWheelView_lwvCursorSize, mCursorSize)
+        attrs?.let{
+            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.WheelView)
+            mHighlightColor = typedArray.getColor(R.styleable.WheelView_highlightColor, mHighlightColor)
+            mMarkTextColor = typedArray.getColor(R.styleable.WheelView_markTextColor, mMarkTextColor)
+            mMarkColor = typedArray.getColor(R.styleable.WheelView_markColor, mMarkColor)
+            mIntervalFactor = typedArray.getFloat(R.styleable.WheelView_intervalFactor, mIntervalFactor)
+            mMarkRatio = typedArray.getFloat(R.styleable.WheelView_markRatio, mMarkRatio)
+            mAdditionCenterMark = typedArray.getString(R.styleable.WheelView_additionalCenterMark)
+            mCenterTextSize = typedArray.getDimension(R.styleable.WheelView_centerMarkTextSize, mCenterTextSize)
+            mNormalTextSize = typedArray.getDimension(R.styleable.WheelView_markTextSize, mNormalTextSize)
+            mCursorSize = typedArray.getDimension(R.styleable.WheelView_cursorSize, mCursorSize)
             typedArray.recycle()
         }
+
         mFadeMarkColor = mHighlightColor and -0x55000001
         mIntervalFactor = Math.max(1f, mIntervalFactor)
         mMarkRatio = Math.min(1f, mMarkRatio)
