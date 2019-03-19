@@ -384,6 +384,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
         }
     }
 
+    @Suppress("unused")
     fun setAdditionCenterMark(additionCenterMark: String) {
         this.additionCenterMark = additionCenterMark
         calcIntervalDis()
@@ -429,6 +430,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
         }
     }
 
+    @Suppress("unused")
     fun smoothSelectIndex(index: Int) {
         if (!scroller.isFinished) {
             scroller.abortAnimation()
@@ -545,6 +547,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
         }
 
         companion object {
+            @Suppress("unused")
             @JvmField
             val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
                 override fun createFromParcel(incoming: Parcel): SavedState {
