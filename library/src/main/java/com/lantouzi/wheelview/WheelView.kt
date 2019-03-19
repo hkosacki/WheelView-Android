@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
@@ -39,6 +38,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private var normalTextColor: Int = 0
     private var markColor: Int = 0
     private var fadeMarkColor: Int = 0
+    private val colorTransparent: Int = 0x00000000
 
     private var internalHeight: Int = 0
     private var additionCenterMark: String? = null
@@ -264,8 +264,6 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val sizeDiv2 = cursorSize / 2f
-        val sizeDiv3 = cursorSize / 3f
 
         markPaint.color = highlightColor
         canvas.drawCircle(width / 2f + scrollX, height / 2f + 30, WHEEL_RADIUS, markPaint)
@@ -286,23 +284,21 @@ class WheelView : View, GestureDetector.OnGestureListener {
         var x = start * intervalDis
 
         val markHeight = internalHeight.toFloat() * 0.2f
-        var smallMarkShrinkY = internalHeight.toFloat() * 0.15f
+        val smallMarkShrinkY = internalHeight.toFloat() * 0.15f
 
         for (i in start until end) {
             val tempDis = intervalDis / 3f
             // offset: Small mark offset Big mark
             for (offset in -1..1) {
                 val ox = x + offset * tempDis
-
-                if (i in 0..markCount && selectedPosition == i) {
-                    val tempOffset = Math.abs(offset)
-                    when (tempOffset) {
-                        0 -> markPaint.color = highlightColor
-                        1 -> markPaint.color = fadeMarkColor
-                        else -> markPaint.color = markColor
-                    }
-                } else {
+                // exclude the
+                if (i in 0 until markCount
+                    // filter out the edge cases out of the ruler range
+                    && (((i != 0 && offset != 1)) || (i != markCount - 1 && offset != -1))
+                ) {
                     markPaint.color = markColor
+                } else {
+                    markPaint.color = colorTransparent
                 }
 
                 if (offset == 0) {
@@ -335,7 +331,14 @@ class WheelView : View, GestureDetector.OnGestureListener {
                     if (!TextUtils.isEmpty(additionCenterMark)) {
                         val off = additionCenterMarkWidth / 2f
                         val tsize = markTextPaint.measureText(text, 0, text.length)
-                        canvas.drawText(text, 0, text.length, x - off, topSpace + markHeight + centerTextSize, markTextPaint)
+                        canvas.drawText(
+                            text,
+                            0,
+                            text.length,
+                            x - off,
+                            topSpace + markHeight + centerTextSize,
+                            markTextPaint
+                        )
                         markTextPaint.textSize = normalTextSize
                         canvas.drawText(
                             additionCenterMark!!,
