@@ -21,7 +21,6 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.SoundEffectConstants
 import android.view.View
-import android.widget.OverScroller
 import android.widget.Scroller
 import com.lantouzi.wheelview.library.R
 
@@ -36,7 +35,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
         private set
 
     private var highlightColor: Int = 0
-    private var markTextColor: Int = 0
+    private var markedTextColor: Int = 0
+    private var normalTextColor: Int = 0
     private var markColor: Int = 0
     private var fadeMarkColor: Int = 0
 
@@ -51,7 +51,6 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
     private var markCount: Int = 0
     private var additionCenterMarkWidth: Float = 0.0f
-    private val centerIndicatorPath = Path()
     private var cursorSize: Float = 0.0f
     private var viewScopeSize: Int = 0
 
@@ -122,10 +121,11 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private fun init(attrs: AttributeSet?) {
         val density = resources.displayMetrics.density
         centerMarkWidth = (density * 1.5f + 0.5f).toInt().toFloat()
-        markWidth = density
+        markWidth = centerMarkWidth
 
         highlightColor = 0xFFF74C39.toInt()
-        markTextColor = 0xFF666666.toInt()
+        markedTextColor = 0xFFFFFFFF.toInt()
+        normalTextColor = 0xFF666666.toInt()
         markColor = 0xFFEEEEEE.toInt()
         cursorSize = density * 18
         centerTextSize = density * 22
@@ -135,7 +135,8 @@ class WheelView : View, GestureDetector.OnGestureListener {
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.WheelView)
             highlightColor = typedArray.getColor(R.styleable.WheelView_highlightColor, highlightColor)
-            markTextColor = typedArray.getColor(R.styleable.WheelView_markTextColor, markTextColor)
+            markedTextColor = typedArray.getColor(R.styleable.WheelView_markTextColor, markedTextColor)
+            normalTextColor = typedArray.getColor(R.styleable.WheelView_normalTextColor, normalTextColor)
             markColor = typedArray.getColor(R.styleable.WheelView_markColor, markColor)
             intervalFactor = typedArray.getFloat(R.styleable.WheelView_intervalFactor, intervalFactor)
             markRatio = typedArray.getFloat(R.styleable.WheelView_markRatio, markRatio)
@@ -227,7 +228,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
     private fun measureHeight(heightMeasure: Int): Int {
         val measureMode = View.MeasureSpec.getMode(heightMeasure)
         val measureSize = View.MeasureSpec.getSize(heightMeasure)
-        var result = (bottomSpace + topSpace * 2 + centerTextSize).toInt()
+        var result = (bottomSpace + topSpace * 2 + centerTextSize + WHEEL_RADIUS.toInt() * 2).toInt()
         when (measureMode) {
             View.MeasureSpec.EXACTLY -> result = Math.max(result, measureSize)
             View.MeasureSpec.AT_MOST -> result = Math.min(result, measureSize)
@@ -263,21 +264,11 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        centerIndicatorPath.reset()
         val sizeDiv2 = cursorSize / 2f
         val sizeDiv3 = cursorSize / 3f
-        with(centerIndicatorPath) {
-            moveTo(maxOverScrollDistance - sizeDiv2 + scrollX, 0f)
-            rLineTo(0f, sizeDiv3)
-            rLineTo(sizeDiv2, sizeDiv2)
-            rLineTo(sizeDiv2, -sizeDiv2)
-            rLineTo(0f, -sizeDiv3)
-            close()
-        }
 
         markPaint.color = highlightColor
-        canvas.drawPath(centerIndicatorPath, markPaint)
+        canvas.drawCircle(width / 2f + scrollX, height / 2f + 30, WHEEL_RADIUS, markPaint)
 
         var start = selectedPosition - viewScopeSize
         var end = selectedPosition + viewScopeSize + 1

@@ -4,6 +4,7 @@
 		<attr name="highlightColor" format="color|reference"/>
 		<attr name="markColor" format="color|reference"/>
 		<attr name="markTextColor" format="color|reference"/>
+		<attr name="normalTextColor" format="color|reference"/>
 		<attr name="intervalFactor" format="float"/>
 		<attr name="markRatio" format="float"/>
 		<attr name="rulerFont" format="reference"/>
