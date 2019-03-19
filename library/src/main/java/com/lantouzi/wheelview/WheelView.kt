@@ -285,15 +285,13 @@ class WheelView : View, GestureDetector.OnGestureListener {
 
         var x = start * intervalDis
 
-        val markHeight = internalHeight.toFloat() - bottomSpace - centerTextSize - topSpace
-        // small scale Y offset
-        var smallMarkShrinkY = markHeight * (1 - markRatio) / 2f
-        smallMarkShrinkY = Math.min((markHeight - markWidth) / 2f, smallMarkShrinkY)
+        val markHeight = internalHeight.toFloat() * 0.2f
+        var smallMarkShrinkY = internalHeight.toFloat() * 0.15f
 
         for (i in start until end) {
-            val tempDis = intervalDis / 5f
+            val tempDis = intervalDis / 3f
             // offset: Small mark offset Big mark
-            for (offset in -2..2) {
+            for (offset in -1..1) {
                 val ox = x + offset * tempDis
 
                 if (i in 0..markCount && selectedPosition == i) {
@@ -325,18 +323,19 @@ class WheelView : View, GestureDetector.OnGestureListener {
             }
 
             // mark text
+            fontTypeface?.let {
+                markTextPaint.typeface = it
+            }
             if (markCount > 0 && i >= 0 && i < markCount) {
-                val temp = items[i]
+                val text = items[i]
                 if (selectedPosition == i) {
-                    fontTypeface?.let {
-                        markTextPaint.typeface = it
-                    }
-                    markTextPaint.color = highlightColor
+                    // draw selected position
+                    markTextPaint.color = markedTextColor
                     markTextPaint.textSize = centerTextSize
                     if (!TextUtils.isEmpty(additionCenterMark)) {
                         val off = additionCenterMarkWidth / 2f
-                        val tsize = markTextPaint.measureText(temp, 0, temp.length)
-                        canvas.drawText(temp, 0, temp.length, x - off, internalHeight - bottomSpace, markTextPaint)
+                        val tsize = markTextPaint.measureText(text, 0, text.length)
+                        canvas.drawText(text, 0, text.length, x - off, topSpace + markHeight + centerTextSize, markTextPaint)
                         markTextPaint.textSize = normalTextSize
                         canvas.drawText(
                             additionCenterMark!!,
@@ -345,12 +344,13 @@ class WheelView : View, GestureDetector.OnGestureListener {
                             markTextPaint
                         )
                     } else {
-                        canvas.drawText(temp, 0, temp.length, x, internalHeight - bottomSpace, markTextPaint)
+                        canvas.drawText(text, 0, text.length, x, topSpace + markHeight + centerTextSize, markTextPaint)
                     }
                 } else {
-                    markTextPaint.color = markTextColor
+                    //draw other positions
+                    markTextPaint.color = normalTextColor
                     markTextPaint.textSize = normalTextSize
-                    canvas.drawText(temp, 0, temp.length, x, internalHeight - bottomSpace, markTextPaint)
+                    canvas.drawText(text, 0, text.length, x, topSpace + markHeight + normalTextSize, markTextPaint)
                 }
             }
 
