@@ -361,6 +361,7 @@ class WheelView : View, GestureDetector.OnGestureListener {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility") // this is scrollable, not clickable
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (items.isEmpty() || !isEnabled) {
             return false
