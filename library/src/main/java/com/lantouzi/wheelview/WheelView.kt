@@ -563,5 +563,6 @@ class WheelView : View, GestureDetector.OnGestureListener {
         const val DEFAULT_MARK_RATIO = 0.7f
 
         const val NO_VAULE = -1
+        const val WHEEL_RADIUS = 110f
     }
 }
